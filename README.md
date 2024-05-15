@@ -1,5 +1,5 @@
 # rotoplexer
- Nanovolt scanner with rotary switches
+ Nanovolt scanner with rotary switches, first draft for experimentation only
 
 Inspired by
 https://dataproof.com/Publications/NBS430.PDF
