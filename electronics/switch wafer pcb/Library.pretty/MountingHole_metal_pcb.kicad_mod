@@ -1,0 +1,99 @@
+(footprint "MountingHole_metal_pcb"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(descr "Mounting Hole 5.3mm, M5, DIN965")
+	(tags "mounting hole 5.3mm m5 din965")
+	(property "Reference" "J10"
+		(at 0 -5.6 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "cce04be3-9591-4ed8-897d-b9c2e1e013a2")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "Conn_01x01"
+		(at 0 5.6 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "f83c9dc7-98d1-498e-b4d8-6ee795849e6d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" "MountingHole:MountingHole_5.3mm_M5_DIN965_Pad_TopOnly"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "204d38fb-583a-416e-a9b6-24cc57102277")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "08a7f8c3-18a0-4999-8b31-b82c81b5d1a9")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "4cb9b2d4-9e2c-4c5a-972c-a3c202c121ee")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr exclude_from_pos_files)
+	(fp_circle
+		(center 0 0)
+		(end 4 0)
+		(stroke
+			(width 2)
+			(type default)
+		)
+		(fill none)
+		(layer "F.Cu")
+		(uuid "247978ff-a9df-4110-9a2e-2b4fc27b20a5")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "ba122d87-1a85-4e42-b1c7-1706463e19cb")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "" np_thru_hole circle
+		(at 0 0)
+		(size 5.7 5.7)
+		(drill 5.3)
+		(layers "*.Mask")
+		(uuid "93a892d6-414b-496e-810a-d38a22090979")
+	)
+)

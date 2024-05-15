@@ -1,0 +1,23 @@
+%TF.GenerationSoftware,KiCad,Pcbnew,8.0.1*%
+%TF.CreationDate,2024-03-25T08:35:16+01:00*%
+%TF.ProjectId,rotary_switch_nv_scanner,726f7461-7279-45f7-9377-697463685f6e,rev?*%
+%TF.SameCoordinates,Original*%
+%TF.FileFunction,Legend,Top*%
+%TF.FilePolarity,Positive*%
+%FSLAX46Y46*%
+G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
+G04 Created by KiCad (PCBNEW 8.0.1) date 2024-03-25 08:35:16*
+%MOMM*%
+%LPD*%
+G01*
+G04 APERTURE LIST*
+%ADD10C,0.120000*%
+G04 APERTURE END LIST*
+D10*
+%TO.C,R1*%
+X141516822Y-72783683D02*
+X141639635Y-73242029D01*
+X142526215Y-72513217D02*
+X142649028Y-72971563D01*
+%TD*%
+M02*
