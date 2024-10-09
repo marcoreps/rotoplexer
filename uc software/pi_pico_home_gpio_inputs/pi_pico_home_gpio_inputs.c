@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
-#include <string.h>
 
 #define STEP_pin 28
 #define DIR_pin 27
 #define MICROSTEPS 8
-#define DELAY_ms 20
-#define STEP_LENGTH_ms 2
+#define DELAY_ms 10
+#define STEP_LENGTH_ms 1
 
 typedef struct{
    int en_pin;
@@ -22,20 +21,19 @@ bool homing_commanded = 0;
 bool move_commanded = 0;
 int active_axis = 0;
 int destination = 0;
-int diagnoisis_counter = 0;
 
 int calculate_steps_from_switch_pos(int switch_pos){
   return (200*MICROSTEPS/12)*switch_pos;
 }
 
-int round_to_microsteps(int numToRound){
+int round_to_fullsteps(int numToRound){
   // We disable drivers when not in use, causing motors to snap to the nearest full step.
   // Doing this often accumulates a position error, so we should only halt at full steps.
-  int remainder = numToRound % MICROSTEPS;
+  int remainder = numToRound % (MICROSTEPS*4);
   if (remainder == 0)
     return numToRound;
-  if (remainder >= MICROSTEPS/2)
-    return numToRound + MICROSTEPS - remainder;
+  if (remainder >= MICROSTEPS*2)
+    return numToRound + MICROSTEPS*4 - remainder;
   else
     return numToRound - remainder;
 }
@@ -57,30 +55,41 @@ void process_command(char *command){
     }
     if (command[1]=='0'){
       // If commanded destination is 0 we go home
-      diagnoisis_counter = 0;
-      gpio_put(axes[active_axis].en_pin, 0);
-      sleep_ms(DELAY_ms);
       destination=-1;
       update_dir();
+      gpio_put(axes[active_axis].en_pin, 0);
+      sleep_ms(DELAY_ms);
+
       printf("homing commanded:");
       homing_commanded = 1;
       return;
     }
-    else{
+    if(command[1] > 48 && command[1] < 60){
       // Otherwise we go to destination
       // Switch positions 123456789:;
-      diagnoisis_counter = 0;
       destination=calculate_steps_from_switch_pos(command[1]%12);
       destination-=axes[active_axis].zero_offset;
-      destination=round_to_microsteps(destination);
+      destination=round_to_fullsteps(destination);
+
+      if (destination == axes[active_axis].position){
+        printf("done\n");
+        return;
+      }
+
+      update_dir();
       gpio_put(axes[active_axis].en_pin, 0);
       sleep_ms(DELAY_ms);
-      update_dir();
       move_commanded = 1;
       printf("dest ");
       printf("%d",destination);
       printf(":");
+      printf("pos ");
+      printf("%d",axes[active_axis].position);
+      printf(":");
     }
+    else
+      printf("position out of range 0 ... ;\n");
+  return;
   }
   else
     printf("axis out of range a ... l\n");
@@ -115,27 +124,22 @@ void wiggle(){
 }
 
 void move_worker(){
+  gpio_put(STEP_pin, 1);
+  sleep_ms(STEP_LENGTH_ms);
+  gpio_put(STEP_pin, 0);
+  sleep_ms(STEP_LENGTH_ms);
+  if (!gpio_get(DIR_pin))
+    axes[active_axis].position++;
+  else
+    axes[active_axis].position--;
+
   if (destination == axes[active_axis].position){
     move_commanded=0;
     sleep_ms(DELAY_ms);
     //wiggle();
     gpio_put(axes[active_axis].en_pin, 1);
     sleep_ms(DELAY_ms);
-    printf("diag ");
-    printf("%d",diagnoisis_counter);
-    printf(":");
     printf("done\n");
-  }
-  else{
-    diagnoisis_counter++;
-    gpio_put(STEP_pin, 1);
-    sleep_ms(STEP_LENGTH_ms);
-    gpio_put(STEP_pin, 0);
-    sleep_ms(STEP_LENGTH_ms);
-    if (!gpio_get(DIR_pin))
-      axes[active_axis].position++;
-    else
-      axes[active_axis].position--;
   }
 }
 
@@ -149,16 +153,12 @@ void home_worker(){
     axes[active_axis].position=0;
     destination=calculate_steps_from_switch_pos(1);
     destination-=axes[active_axis].zero_offset;
-    destination=round_to_microsteps(destination);
+    destination=round_to_fullsteps(destination);
     update_dir();
     move_commanded = 1;
     homing_commanded = 0;
-    printf("diag ");
-    printf("%d",diagnoisis_counter);
-    printf(":");
   }
   else{
-    diagnoisis_counter++;
     gpio_put(STEP_pin, 1);
     sleep_ms(STEP_LENGTH_ms);
     gpio_put(STEP_pin, 0);
@@ -170,7 +170,7 @@ int main(){
 
   axes[0].en_pin=26;
   axes[0].home_pin=9;
-  axes[0].zero_offset=430; //a
+  axes[0].zero_offset=455; //a
   axes[0].position=0;
 
   axes[1].en_pin=16;
@@ -180,7 +180,7 @@ int main(){
 
   axes[2].en_pin=22;
   axes[2].home_pin=10;
-  axes[2].zero_offset=500; //c
+  axes[2].zero_offset=520; //c
   axes[2].position=0;
 
   axes[3].en_pin=17;
@@ -190,7 +190,7 @@ int main(){
 
   axes[4].en_pin=21;
   axes[4].home_pin=11;
-  axes[4].zero_offset=210; //e
+  axes[4].zero_offset=230; //e
   axes[4].position=0;
 
   axes[5].en_pin=12;
@@ -200,7 +200,7 @@ int main(){
 
   axes[6].en_pin=20;
   axes[6].home_pin=8;
-  axes[6].zero_offset=50; //g
+  axes[6].zero_offset=65; //g
   axes[6].position=0;
 
   axes[7].en_pin=13;
@@ -210,7 +210,7 @@ int main(){
 
   axes[8].en_pin=19;
   axes[8].home_pin=7;
-  axes[8].zero_offset=330; //i
+  axes[8].zero_offset=335; //i
   axes[8].position=0;
 
   axes[9].en_pin=14;
@@ -220,7 +220,7 @@ int main(){
 
   axes[10].en_pin=18;
   axes[10].home_pin=6;
-  axes[10].zero_offset=980; //k
+  axes[10].zero_offset=1005; //k
   axes[10].position=0;
 
   axes[11].en_pin=15;
@@ -247,17 +247,18 @@ int main(){
   printf("Here goes nothin ...\n");
 
   // TODO Crash if longer strings are received?
+  // TODO Terrible things happen if we interrupt an operation with another cmd
   static signed char serialString[32] = {0};
   stdio_set_chars_available_callback(&serial_available, (void*) serialString);
 
   while (1) {
-      if (serialString[0]){
-        process_command(serialString);
-        serialString[0] = '\0';
-      }
-      if (move_commanded)
-        move_worker();
-      if(homing_commanded)
-        home_worker();
+    if (serialString[0]){
+      process_command(serialString);
+      serialString[0] = '\0';
+    }
+    if (move_commanded)
+      move_worker();
+    if(homing_commanded)
+      home_worker();
   }
 }
