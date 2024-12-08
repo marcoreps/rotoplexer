@@ -105,10 +105,12 @@ void serial_available(void* cmd){
 }
 
 void wiggle(){
-  for(int i=6;i>0;i--){
+  int last=0;
+  for(int i=6;i>=0;i--){
     gpio_put(DIR_pin, (i%2 == 0));
     sleep_ms(DELAY_ms);
-    int j=i*MICROSTEPS;
+    int j=(i+last)*MICROSTEPS;
+    last = i;
     while(j){
       gpio_put(STEP_pin, 1);
       sleep_ms(STEP_LENGTH_ms);
@@ -136,7 +138,7 @@ void move_worker(){
   if (destination == axes[active_axis].position){
     move_commanded=0;
     sleep_ms(DELAY_ms);
-    //wiggle();
+    wiggle();
     gpio_put(axes[active_axis].en_pin, 1);
     sleep_ms(DELAY_ms);
     printf("done\n");
@@ -160,9 +162,9 @@ void home_worker(){
   }
   else{
     gpio_put(STEP_pin, 1);
-    sleep_ms(STEP_LENGTH_ms);
+    sleep_ms(STEP_LENGTH_ms*2);
     gpio_put(STEP_pin, 0);
-    sleep_ms(STEP_LENGTH_ms);
+    sleep_ms(STEP_LENGTH_ms*2);
   }
 }
 
